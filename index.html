@@ -11,6 +11,7 @@
             --md-sys-color-background: #F7FBF7;
             --md-sys-color-on-background: #191C19;
             --md-sys-color-surface: #FFFFFF;
+            --md-sys-color-surface-container: #EBEFEB;
             --md-sys-color-on-surface: #191C19;
             --md-sys-color-primary: #006C4C;
             --md-sys-color-on-primary: #FFFFFF;
@@ -22,7 +23,6 @@
             
             --md-sys-shape-corner-large: 16px;
             --md-sys-shape-corner-full: 999px;
-            
             --md-sys-elevation-1: 0px 1px 2px 0px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15);
         }
 
@@ -30,6 +30,7 @@
             --md-sys-color-background: #101410;
             --md-sys-color-on-background: #E0E4DF;
             --md-sys-color-surface: #191C19;
+            --md-sys-color-surface-container: #202420;
             --md-sys-color-on-surface: #E0E4DF;
             --md-sys-color-primary: #6CDBAC;
             --md-sys-color-on-primary: #003825;
@@ -45,15 +46,30 @@
         body {
             background-color: var(--md-sys-color-background);
             color: var(--md-sys-color-on-background);
-            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden;
+        }
+
+        /* Основной контент */
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            padding-bottom: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px;
-            transition: background-color 0.3s, color 0.3s;
         }
 
-        .header { text-align: center; margin-bottom: 32px; margin-top: 20px; }
+        .page { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.3s ease-out; }
+        .page.active { display: flex; flex-direction: column; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header { text-align: center; margin-bottom: 32px; margin-top: 20px; width: 100%; }
         h1 { font-size: 32px; font-weight: 400; color: var(--md-sys-color-primary); margin-bottom: 8px; letter-spacing: 0.5px; }
         .subtitle { font-size: 14px; color: var(--md-sys-color-on-surface-variant); }
 
@@ -63,7 +79,6 @@
             border-radius: var(--md-sys-shape-corner-large);
             box-shadow: var(--md-sys-elevation-1);
             width: 100%;
-            max-width: 400px;
             padding: 24px;
             margin-bottom: 16px;
             display: flex;
@@ -91,7 +106,6 @@
             word-break: break-all;
             text-align: center;
             line-height: 1.5;
-            transition: color 0.3s;
         }
 
         /* Material 3 Button */
@@ -104,7 +118,6 @@
             font-size: 16px;
             font-weight: 500;
             width: 100%;
-            max-width: 400px;
             cursor: pointer;
             transition: background-color 0.2s, opacity 0.2s;
             box-shadow: var(--md-sys-elevation-1);
@@ -114,10 +127,71 @@
 
         .stats { margin-bottom: 24px; font-size: 14px; color: var(--md-sys-color-on-surface-variant); text-align: center; }
 
+        /* Настройки */
+        .settings-list {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-shape-corner-large);
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid var(--md-sys-color-surface-variant);
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--md-sys-color-surface-variant);
+            font-size: 16px;
+            color: var(--md-sys-color-on-surface);
+        }
+        .settings-item:last-child { border-bottom: none; }
+
+        /* Material 3 Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 32px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--md-sys-color-surface-variant);
+            border: 2px solid var(--md-sys-color-outline);
+            transition: .3s; border-radius: 32px;
+        }
+        .slider:before {
+            position: absolute; content: "";
+            height: 16px; width: 16px;
+            left: 6px; bottom: 6px;
+            background-color: var(--md-sys-color-outline);
+            transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--md-sys-color-primary);
+            border-color: var(--md-sys-color-primary);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: var(--md-sys-color-on-primary);
+            height: 24px; width: 24px;
+            left: 2px; bottom: 2px;
+        }
+
+        /* Информация */
+        .info-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-bottom: 16px;
+        }
+        .info-title { font-size: 18px; font-weight: 500; color: var(--md-sys-color-on-surface); margin-bottom: 8px; }
+
         /* Уведомление */
         .toast {
             position: fixed;
-            bottom: 40px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             background-color: var(--md-sys-color-primary-container);
@@ -133,38 +207,158 @@
             box-shadow: var(--md-sys-elevation-1);
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Bottom Navigation (Material 3) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background-color: var(--md-sys-color-surface-container);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 100;
+            border-top: 1px solid var(--md-sys-color-surface-variant);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+            cursor: pointer;
+            color: var(--md-sys-color-on-surface-variant);
+            transition: color 0.2s;
+        }
+        .nav-item.active { color: var(--md-sys-color-on-primary-container); }
+        
+        /* Иконки через SVG */
+        .nav-icon {
+            width: 24px; height: 24px; margin-bottom: 4px;
+            background-color: currentColor;
+            mask-size: contain; mask-repeat: no-repeat; mask-position: center;
+            -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center;
+        }
+        .nav-label { font-size: 12px; font-weight: 500; }
+
+        /* Фон для активной вкладки */
+        .nav-item .indicator {
+            width: 64px; height: 32px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav-item.active .indicator {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+        .nav-item.active .nav-icon { color: var(--md-sys-color-on-primary-container); }
+
+        /* Иконки */
+        .icon-info { mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'); }
+        .icon-home { mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'); }
+        .icon-settings { mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>ZetaVPN</h1>
-        <p class="subtitle">Бесплатный доступ</p>
+    <div class="content">
+        
+        <!-- Страница: Информация (Слева) -->
+        <div id="page-info" class="page">
+            <div class="header">
+                <h1>Информация</h1>
+                <p class="subtitle">О приложении</p>
+            </div>
+
+            <div class="card" style="cursor: default; align-items: flex-start; padding: 24px;">
+                <div class="info-title">О боте</div>
+                <div class="info-text">ZetaVPN собирает бесплатные ключи из открытых источников. Мы не храним ваши данные и не ведём логи.</div>
+                
+                <div class="info-title" style="margin-top: 16px;">Как скопировать ключ</div>
+                <div class="info-text">Перейдите во вкладку «Основное» и нажмите на карточку с ключом. Он автоматически скопируется в буфер обмена.</div>
+
+                <div class="info-title" style="margin-top: 16px;">Как использовать</div>
+                <div class="info-text">Откройте VPN-клиент (v2rayNG, Karing, Hiddify), нажмите «Добавить из буфера обмена» и подключитесь.</div>
+            </div>
+        </div>
+
+        <!-- Страница: Основное (По центру) -->
+        <div id="page-main" class="page active">
+            <div class="header">
+                <h1>ZetaVPN</h1>
+                <p class="subtitle">Бесплатный доступ</p>
+            </div>
+
+            <div id="stats" class="stats">
+                Загрузка базы...
+            </div>
+
+            <div class="card" id="keyCard" onclick="copyKey()" style="display: none;">
+                <div class="card-region" id="regionText"></div>
+                <div class="card-key" id="keyText"></div>
+            </div>
+
+            <button class="btn" id="getKeyBtn" onclick="getNewKey()" disabled>
+                Получить новый ключ
+            </button>
+        </div>
+
+        <!-- Страница: Настройки (Справа) -->
+        <div id="page-settings" class="page">
+            <div class="header">
+                <h1>Настройки</h1>
+                <p class="subtitle">Конфигурация</p>
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-item">
+                    <span>Тёмная тема</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeCheckbox" onchange="toggleTheme()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div id="stats" class="stats">
-        Загрузка базы...
-    </div>
-
-    <!-- Карточка (при клике копирует) -->
-    <div class="card" id="keyCard" onclick="copyKey()" style="display: none;">
-        <div class="card-region" id="regionText"></div>
-        <div class="card-key" id="keyText"></div>
-    </div>
-
-    <button class="btn" id="getKeyBtn" onclick="getNewKey()" disabled>
-        Получить новый ключ
-    </button>
-
+    <!-- Всплывающее уведомление -->
     <div class="toast" id="toast">Скопировано</div>
+
+    <!-- Нижняя панель навигации (Info - Main - Settings) -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="switchPage('info', this)" id="nav-info">
+            <div class="indicator"><div class="nav-icon icon-info"></div></div>
+            <div class="nav-label">Информация</div>
+        </div>
+        
+        <div class="nav-item active" onclick="switchPage('main', this)" id="nav-main">
+            <div class="indicator"><div class="nav-icon icon-home"></div></div>
+            <div class="nav-label">Основное</div>
+        </div>
+        
+        <div class="nav-item" onclick="switchPage('settings', this)" id="nav-settings">
+            <div class="indicator"><div class="nav-icon icon-settings"></div></div>
+            <div class="nav-label">Настройки</div>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Проверка системной темы
+        // Проверка системной темы при загрузке
+        const themeCheckbox = document.getElementById('themeCheckbox');
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.classList.add('dark-theme');
+            themeCheckbox.checked = true;
         }
 
         const SOURCES = [
@@ -214,17 +408,16 @@
             currentKey = parts[0];
             document.getElementById('regionText').innerText = region;
             document.getElementById('keyText').innerText = currentKey;
+            tg.HapticFeedback.impactOccurred('light');
         }
 
         function copyKey() {
             if (!currentKey) return;
 
-            // Копирование
             navigator.clipboard.writeText(currentKey).then(() => {
                 showToast();
                 tg.HapticFeedback.notificationOccurred('success');
             }).catch(() => {
-                // Fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = currentKey;
                 document.body.appendChild(textArea);
@@ -238,9 +431,27 @@
         function showToast() {
             const toast = document.getElementById('toast');
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
+        }
+
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+            
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function toggleTheme() {
+            const isDark = themeCheckbox.checked;
+            if (isDark) {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            tg.HapticFeedback.impactOccurred('light');
         }
 
         loadKeys();

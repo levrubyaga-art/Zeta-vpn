@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZetaVPN</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #00FF88 0%, #006633 100%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            color: white; padding: 20px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
+            border-radius: 24px; padding: 30px; width: 100%; max-width: 400px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.2);
+        }
+        h1 { font-size: 36px; margin-bottom: 8px; }
+        .subtitle { opacity: 0.9; margin-bottom: 25px; font-size: 14px; }
+        .btn {
+            background: white; color: #006633; border: none; padding: 16px;
+            border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer;
+            width: 100%; margin-bottom: 12px;
+        }
+        .btn:disabled { opacity: 0.5; }
+        .key-box {
+            background: rgba(0,0,0,0.4); padding: 16px; border-radius: 14px;
+            margin-top: 20px; word-break: break-all; display: none;
+            font-family: monospace; font-size: 12px; text-align: left;
+        }
+        .region { color: #00FF88; font-weight: bold; margin-bottom: 8px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌌 ZetaVPN</h1>
+        <p class="subtitle">Бесплатный и быстрый доступ</p>
+
+        <div id="stats" style="margin-bottom: 20px; font-size: 13px; opacity: 0.8;">
+            Загрузка базы...
+        </div>
+
+        <button class="btn" id="getKeyBtn" onclick="getKey()" disabled>
+            🔑 Получить ключ
+        </button>
+
+        <div id="keyBox" class="key-box">
+            <div id="regionText" class="region"></div>
+            <div id="keyText"></div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const SOURCES = [
+            "https://raw.githubusercontent.com/flaafix/AetrisVPN/main/AetrisVPN.txt",
+            "https://raw.githubusercontent.com/aviamastersgh/vpn-free-russia/main/verified_configs.txt",
+            "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS_mobile.txt",
+            "https://raw.githubusercontent.com/PrinceVSFX/Hysteria2-Configs/main/Configs_list.txt",
+            "https://raw.githubusercontent.com/Au1rxx/free-vpn-subscriptions/main/output/v2ray-base64.txt",
+        ];
+
+        let allKeys = [];
+
+        async function loadKeys() {
+            const statsEl = document.getElementById('stats');
+            
+            for (const url of SOURCES) {
+                try {
+                    const res = await fetch(url);
+                    const text = await res.text();
+                    for (const line of text.split('\n')) {
+                        if (line.includes('://') && line.includes('#')) {
+                            allKeys.push(line.trim());
+                        }
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            allKeys = [...new Set(allKeys)];
+
+            if (allKeys.length > 0) {
+                statsEl.innerHTML = `✅ Серверов: <b>${allKeys.length}</b>`;
+                document.getElementById('getKeyBtn').disabled = false;
+            } else {
+                statsEl.innerHTML = `❌ Не удалось загрузить`;
+            }
+        }
+
+        function getKey() {
+            if (allKeys.length === 0) return;
+            const key = allKeys[Math.floor(Math.random() * allKeys.length)];
+            const parts = key.split('#');
+            const shortKey = parts[0];
+            const region = parts.length > 1 ? parts[1].split('|')[0].trim() : '🌐 Другое';
+
+            document.getElementById('regionText').innerText = '📍 ' + region;
+            document.getElementById('keyText').innerText = shortKey;
+            document.getElementById('keyBox').style.display = 'block';
+
+            navigator.clipboard.writeText(shortKey).then(() => {
+                tg.showAlert('Ключ скопирован!');
+            });
+        }
+
+        loadKeys();
+    </script>
+</body>
+</html>
